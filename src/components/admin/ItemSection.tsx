@@ -374,24 +374,23 @@ const ItemSection: React.FC<Props> = ({ categories, subcategories, items, setPop
 
 
       {/* Adding Form */}
-      <div className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-soft relative overflow-hidden group">
+      <div className="bg-white p-10 border border-gray-100 shadow-soft relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-colors pointer-events-none" />
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-10">
           <div className="flex items-center gap-6">
-            <div className="w-16 h-16 rounded-3xl bg-primary/5 text-primary flex items-center justify-center text-3xl shadow-inner transition-transform group-hover:scale-110">
+            <div className="w-16 h-16 rounded-2xl bg-primary/5 text-primary flex items-center justify-center text-3xl shadow-inner transition-transform group-hover:scale-110">
               <FiPlus />
             </div>
             <div>
-              <h2 className="text-2xl sm:text-3xl font-black text-gray-900">{t('admin.add_new_item')}</h2>
-              <p className="text-gray-400 text-sm font-medium mt-1.5">{t('admin.item_details_desc')}</p>
+              <h2 className="text-2xl sm:text-xl font-black text-gray-900">{t('admin.add_new_item')}</h2>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
           <div className="flex flex-col gap-3">
-            <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 px-1">{t('admin.categories')}</label>
+            <label className="text-sm md:text-lg font-bold uppercase tracking-[0.2em] text-gray-400 px-1">{t('admin.categories')}</label>
             <CustomSelect
               options={Object.keys(categories).map(id => ({ id, name: categories[id].nameAr || "" }))}
               value={selectedCategory}
@@ -402,7 +401,7 @@ const ItemSection: React.FC<Props> = ({ categories, subcategories, items, setPop
           </div>
 
           <div className={`flex flex-col gap-3 transition-all duration-500 ${currentCatSubcategories.length > 0 ? "opacity-100 translate-y-0" : "opacity-30 pointer-events-none translate-y-2"}`}>
-            <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 px-1">{t('admin.subcategories')}</label>
+            <label className="text-sm md:text-lg font-bold uppercase tracking-[0.2em] text-gray-400 px-1">{t('admin.subcategories')}</label>
             <CustomSelect
               options={currentCatSubcategories.map(([id, sub]) => ({ id, name: sub.nameAr || "" }))}
               value={selectedSubcategory}
@@ -413,11 +412,11 @@ const ItemSection: React.FC<Props> = ({ categories, subcategories, items, setPop
           </div>
 
           <div className="flex flex-col gap-3 md:col-span-2">
-            <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 px-1">
+            <label className="text-sm md:text-lg font-bold uppercase tracking-[0.2em] text-gray-400 px-1">
               {t('common.name')}
             </label>
             <input
-              className={`w-full h-14 bg-gray-50 border px-6 rounded-2xl text-base font-bold outline-none focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all
+              className={`w-full h-14 bg-gray-50 border px-6 rounded-2xl text-sm md:text-base lg:text-md outline-none focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all
                 ${itemNameError ? "border-secondary" : "border-gray-100"} text-right`}
               placeholder={t('admin.item_name_ar_placeholder')}
               value={itemNameAr}
@@ -429,11 +428,11 @@ const ItemSection: React.FC<Props> = ({ categories, subcategories, items, setPop
           </div>
 
           <div className="flex flex-col gap-3 md:col-span-2">
-            <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 px-1">
+            <label className="text-sm md:text-lg font-bold uppercase tracking-[0.2em] text-gray-400 px-1">
               {t('admin.ingredients_label')}
             </label>
             <input
-              className="w-full h-14 bg-gray-50 border border-gray-100 px-6 rounded-2xl text-base font-bold outline-none focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all text-right"
+              className="w-full h-14 bg-gray-50 border border-gray-100 px-6 rounded-2xl text-sm md:text-base lg:text-md outline-none focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all text-right"
               placeholder={t('admin.ingredients_placeholder')}
               value={itemIngredientsAr}
               onChange={(e) => setItemIngredientsAr(e.target.value)}
@@ -441,9 +440,9 @@ const ItemSection: React.FC<Props> = ({ categories, subcategories, items, setPop
           </div>
 
           <div className="flex flex-col gap-3">
-            <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 px-1">{t('common.total')}</label>
+            <label className="text-sm md:text-lg font-bold uppercase tracking-[0.2em] text-gray-400 px-1">{t('common.total')}</label>
             <input
-              className={`w-full h-14 bg-gray-50 border px-6 rounded-2xl text-base font-bold outline-none focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all
+              className={`w-full h-14 bg-gray-50 border px-6 rounded-2xl text-sm md:text-base lg:text-md outline-none focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all
                 ${itemPriceError ? "border-secondary" : "border-gray-100"}`}
               placeholder={t('admin.item_price_placeholder')}
               value={itemPrice}
@@ -485,7 +484,7 @@ const ItemSection: React.FC<Props> = ({ categories, subcategories, items, setPop
       <div className="relative group px-2 max-w-2xl mx-auto w-full">
         <FiSearch className={`absolute ${i18n.language === 'ar' ? 'right-8' : 'left-8'} top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors text-2xl`} />
         <input
-          className={`w-full bg-white border border-gray-100 rounded-4xl h-16 ${i18n.language === 'ar' ? 'pr-16 pl-8 text-right' : 'pl-16 pr-8'} text-lg font-bold outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all shadow-premium`}
+          className={`w-full bg-white border border-gray-100 rounded-4xl h-16 ${i18n.language === 'ar' ? 'pr-16 pl-8 text-right' : 'pl-16 pr-8'} text-sm md:text-base lg:text-md font-bold outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all shadow-premium`}
           placeholder={t('admin.search_placeholder')}
           value={quickSearch}
           onChange={(e) => setQuickSearch(e.target.value)}

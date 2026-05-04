@@ -7,12 +7,12 @@ import type { PaymentMethod, PaymentMethodField } from "../../types/payment";
 import { toast } from "react-hot-toast";
 import FeaturedGallery from "./FeaturedGallery";
 
-const paymentImages = [
-    "bop.png",
-    "ipb.png",
-    "jawwalPay.png",
-    "palPay.jpeg"
-];
+const paymentImages = Object.values(
+    import.meta.glob("/public/images/payment/*", {
+        eager: true,
+        as: "url"
+    })
+);
 
 interface Props {
     isOpen: boolean;
@@ -301,49 +301,49 @@ export default function PaymentMethodsModal({ isOpen, onClose }: Props) {
                                                     {/* Fields - Only if type is bank */}
                                                     {editingMethod.type === 'bank' && (
                                                         <div className="pt-8 border-t border-gray-200">
-                                                        <div className="flex items-center justify-between mb-5">
-                                                            <label className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] px-1">{t('admin.account_details')}</label>
-                                                            <button onClick={addField} className="text-primary hover:bg-primary/5 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all border border-transparent hover:border-primary/20">
-                                                                <FiPlus /> {t('admin.add_field')}
-                                                            </button>
-                                                        </div>
+                                                            <div className="flex items-center justify-between mb-5">
+                                                                <label className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] px-1">{t('admin.account_details')}</label>
+                                                                <button onClick={addField} className="text-primary hover:bg-primary/5 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all border border-transparent hover:border-primary/20">
+                                                                    <FiPlus /> {t('admin.add_field')}
+                                                                </button>
+                                                            </div>
 
-                                                        <div className="space-y-4 max-h-[300px] overflow-y-auto pr-3 custom-scrollbar">
-                                                            {editingMethod.fields?.map((field) => (
-                                                                <div key={field.id} className="p-5 bg-white rounded-3xl border border-gray-100 relative group shadow-soft transition-all hover:shadow-premium">
-                                                                    <div className="space-y-3">
-                                                                        <div className="relative">
-                                                                            <input
-                                                                                value={field.label}
-                                                                                onChange={(e) => updateField(field.id, "label", e.target.value)}
-                                                                                placeholder={t('admin.field_label')}
-                                                                                className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-bold outline-none focus:bg-white focus:border-primary transition-all"
-                                                                            />
+                                                            <div className="space-y-4 max-h-[300px] overflow-y-auto pr-3 custom-scrollbar">
+                                                                {editingMethod.fields?.map((field) => (
+                                                                    <div key={field.id} className="p-5 bg-white rounded-3xl border border-gray-100 relative group shadow-soft transition-all hover:shadow-premium">
+                                                                        <div className="space-y-3">
+                                                                            <div className="relative">
+                                                                                <input
+                                                                                    value={field.label}
+                                                                                    onChange={(e) => updateField(field.id, "label", e.target.value)}
+                                                                                    placeholder={t('admin.field_label')}
+                                                                                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-bold outline-none focus:bg-white focus:border-primary transition-all"
+                                                                                />
+                                                                            </div>
+                                                                            <div className="relative">
+                                                                                <input
+                                                                                    value={field.value}
+                                                                                    onChange={(e) => updateField(field.id, "value", e.target.value)}
+                                                                                    placeholder={t('admin.field_value')}
+                                                                                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-bold outline-none focus:bg-white focus:border-primary transition-all"
+                                                                                />
+                                                                            </div>
                                                                         </div>
-                                                                        <div className="relative">
-                                                                            <input
-                                                                                value={field.value}
-                                                                                onChange={(e) => updateField(field.id, "value", e.target.value)}
-                                                                                placeholder={t('admin.field_value')}
-                                                                                className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-bold outline-none focus:bg-white focus:border-primary transition-all"
-                                                                            />
-                                                                        </div>
+                                                                        <button
+                                                                            onClick={() => removeField(field.id)}
+                                                                            className="absolute top-4 left-4 p-2 text-gray-300 hover:text-secondary hover:bg-secondary/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                                                        >
+                                                                            <FiTrash2 size={16} />
+                                                                        </button>
                                                                     </div>
-                                                                    <button
-                                                                        onClick={() => removeField(field.id)}
-                                                                        className="absolute top-4 left-4 p-2 text-gray-300 hover:text-secondary hover:bg-secondary/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                                                                    >
-                                                                        <FiTrash2 size={16} />
-                                                                    </button>
-                                                                </div>
-                                                            ))}
-                                                            {(!editingMethod.fields || editingMethod.fields.length === 0) && (
-                                                                <div className="text-center py-10 border-2 border-dashed border-gray-200 rounded-3xl">
-                                                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t('admin.no_details_placeholder') || "لا يوجد حقول مضافة"}</p>
-                                                                </div>
-                                                            )}
+                                                                ))}
+                                                                {(!editingMethod.fields || editingMethod.fields.length === 0) && (
+                                                                    <div className="text-center py-10 border-2 border-dashed border-gray-200 rounded-3xl">
+                                                                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t('admin.no_details_placeholder') || "لا يوجد حقول مضافة"}</p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                    </div>
                                                     )}
 
                                                     <button

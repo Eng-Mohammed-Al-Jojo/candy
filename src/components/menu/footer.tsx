@@ -7,21 +7,17 @@ import {
   FaPhoneAlt,
   FaTelegramPlane,
   FaTiktok,
-  FaCommentDots,
 } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { ref, onValue } from "firebase/database";
 import { db } from "../../firebase";
 import { useTranslation } from "react-i18next";
-import FeedbackModal from "../menu/FeedbackModal";
 
 const LOCAL_STORAGE_KEY = "footerInfo";
 
 export default function Footer() {
 
   const { t } = useTranslation();
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [complaintsWhatsapp, setComplaintsWhatsapp] = useState("");
 
   const [footer, setFooter] = useState({
     address: "",
@@ -49,16 +45,8 @@ export default function Footer() {
       }
     });
 
-    /* ===== complaintsWhatsapp ===== */
-    const complaintsRef = ref(db, "settings/complaintsWhatsapp");
-    const unsubComplaints = onValue(complaintsRef, (snapshot) => {
-      const value = snapshot.val();
-      setComplaintsWhatsapp(value ? String(value).trim() : "");
-    });
-
     return () => {
       unsubFooter();
-      unsubComplaints();
     };
   }, []);
 
@@ -105,16 +93,7 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Feedback Button */}
-        {complaintsWhatsapp !== "" && (
-          <button
-            onClick={() => setShowFeedbackModal(true)}
-            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-(--menu-primary) text-white font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
-          >
-            <FaCommentDots />
-            <span>{t('admin.feedback')}</span>
-          </button>
-        )}
+
 
         {/* Developer Signature */}
         <div className="pt-8 border-t border-(--menu-border) w-full flex flex-col items-center gap-4">
@@ -128,13 +107,6 @@ export default function Footer() {
           <p className="text-[10px] text-(--menu-text-muted) font-bold">© {new Date().getFullYear()} {t('footer.rights_reserved')}</p>
         </div>
       </div>
-
-      {complaintsWhatsapp !== "" && (
-        <FeedbackModal
-          show={showFeedbackModal}
-          onClose={() => setShowFeedbackModal(false)}
-        />
-      )}
     </footer>
   );
 }
