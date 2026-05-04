@@ -8,9 +8,11 @@ import { toast } from "react-hot-toast";
 import FeaturedGallery from "./FeaturedGallery";
 
 const paymentImages = Object.values(
-    import.meta.glob("/public/images/payment/*", {
+    import.meta.glob("/images/payment/*", {
         eager: true,
-        as: "url"
+        as: "url",
+        import: 'default'
+
     })
 );
 

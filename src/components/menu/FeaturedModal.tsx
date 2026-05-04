@@ -60,8 +60,8 @@ export default function FeaturedModal({ isOpen, onClose, items, orderSystem, onI
             </div>
 
             {/* Scrollable Grid Area */}
-            <div className="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar">
-              <div className="flex flex-col items-center gap-4 sm:gap-6">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
+              <div className="flex flex-col items-center gap-2 sm:gap-1">
                 {items.map((item) => (
                   <ItemRow
                     key={`modal-feat-${item.id}`}

@@ -27,8 +27,13 @@ import CustomSelect from "./CustomSelect";
 
 /* ================== auto load feature images ================== */
 const galleryImages = Object.keys(
-  import.meta.glob("/public/images/*")
-).map((path) => path.replace("/public/images/", ""));
+  import.meta.glob("/images/*", {
+    eager: true,
+    query: "?url",
+    import: 'default'
+
+  })
+).map((path) => path.replace("/images/", ""));
 
 interface Props {
   categories: Record<string, Category>;

@@ -477,7 +477,12 @@ const Popup: React.FC<Props> = ({
         visible={showGallery}
         onClose={() => setShowGallery(false)}
         onSelect={(img) => { setSelectedImg(img); setShowGallery(false); }}
-        galleryImages={Object.keys(import.meta.glob("/public/images/*")).map(p => p.replace("/public/images/", ""))}
+        galleryImages={Object.keys(import.meta.glob("/images/*", {
+          eager: true,
+          query: "?url",
+          import: 'default'
+
+        })).map(p => p.replace("/images/", ""))}
         selectedImage={selectedImg}
       />
     </AnimatePresence >
