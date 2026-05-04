@@ -16,13 +16,13 @@ import { OrderService } from "../services/orderService";
 import { FirebaseService } from "../services/firebaseService";
 import { calculateStats } from "../utils/accountingUtils";
 import { exportOrdersToExcel } from "../utils/excelUtils";
-import { FiDownload } from "react-icons/fi";
 import AnalyticsSection from "../components/admin/AnalyticsSection";
 import OrderDetailsDrawer from "../components/admin/OrderDetailsDrawer";
 import DeleteConfirmationModal from "../components/admin/DeleteConfirmationModal";
 import OrderNotificationToast from "../components/admin/OrderNotificationToast";
 import PaymentMethodsModal from "../components/admin/PaymentMethodsModal";
 import PaymentApprovalsModal from "../components/admin/PaymentApprovalsModal";
+import CloseDayModal from "../components/admin/CloseDayModal";
 import { useOrderNotifications } from "../hooks/useOrderNotifications";
 import { PaymentService } from "../services/paymentService";
 import type { PaymentRecord } from "../types/payment";
@@ -59,6 +59,7 @@ export default function AdminOrdersPage() {
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [isApprovalsModalOpen, setIsApprovalsModalOpen] = useState(false);
+    const [isCloseDayModalOpen, setIsCloseDayModalOpen] = useState(false);
     const [payments, setPayments] = useState<PaymentRecord[]>([]);
 
     // ✅ Notification Management
@@ -100,7 +101,7 @@ export default function AdminOrdersPage() {
     }, [authOk, limit]);
 
     const stats = useMemo(() => calculateStats(orders), [orders]);
-    
+
     // ✅ Augment orders with payment data for detailed export
     const augmentedOrders = useMemo(() => {
         return orders.map(order => {
@@ -233,16 +234,6 @@ export default function AdminOrdersPage() {
                             </button>
 
 
-                            <button
-                                onClick={() => exportOrdersToExcel(augmentedOrders.filter(o => filteredOrders.some(f => f.id === o.id)), "MenuCandy_Orders")}
-                                className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl bg-white text-gray-400 border border-gray-100 hover:text-emerald-500 hover:border-emerald-500/30 shadow-soft transition-all"
-                                title="تصدير إكسل"
-                            >
-                                <FiDownload />
-                            </button>
-
-
-
                             <div className="flex bg-white p-1.5 gap-1.5 rounded-2xl border border-gray-100 shadow-inner">
                                 <button
                                     onClick={() => updateSettings('system', !settings.system)}
@@ -261,21 +252,10 @@ export default function AdminOrdersPage() {
 
                         <div className="flex items-center gap-3">
                             <button
-                                onClick={async () => {
-                                    if (window.confirm("هل أنت متأكد من إغلاق اليوم؟ سيتم تصدير ملف إكسل ثم مسح جميع الطلبات والمدفوعات نهائياً من النظام لبدء يوم جديد.")) {
-                                        try {
-                                            exportOrdersToExcel(augmentedOrders, "Daily_Closing_Orders");
-                                            await OrderService.deleteAllOrders();
-                                            await PaymentService.deleteAllPayments();
-                                            toast.success("تم إغلاق اليوم ومسح البيانات بنجاح");
-                                        } catch (e) {
-                                            toast.error("حدث خطأ أثناء إغلاق اليوم");
-                                        }
-                                    }
-                                }}
+                                onClick={() => setIsCloseDayModalOpen(true)}
                                 className="px-6 py-2.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border border-red-200 transition-all font-black text-xs uppercase tracking-widest shadow-soft flex items-center gap-2"
                             >
-                                <FiTrash2 /> إغلاق اليوم
+                                <FiTrash2 /> إغلاق يومي وتنزيل Excel
                             </button>
 
                             <div className="flex bg-white p-1.5 rounded-2xl border border-gray-100 shadow-inner">
@@ -605,7 +585,6 @@ export default function AdminOrdersPage() {
                         await PaymentService.confirmPayment(p as any, linkedOrder, "admin");
                         toast.success(t('admin.payment_approved_success') || "تم تأكيد الدفع بنجاح");
                     } else {
-                        // fallback if order not found in active state
                         await PaymentService.updatePaymentStatus(p.id, p.orderId, "approved");
                         toast.success(t('admin.payment_approved_success'));
                     }
@@ -613,6 +592,28 @@ export default function AdminOrdersPage() {
                 onReject={async (p: { id: string; orderId: string; }) => {
                     await PaymentService.updatePaymentStatus(p.id, p.orderId, "rejected");
                     toast.error(t('admin.payment_rejected_error'));
+                }}
+            />
+
+            {/* Daily Closing Confirmation Modal */}
+            <CloseDayModal
+                isOpen={isCloseDayModalOpen}
+                onClose={() => setIsCloseDayModalOpen(false)}
+                onConfirm={async () => {
+                    try {
+                        // 1. Export to Excel
+                        exportOrdersToExcel(augmentedOrders, `Daily_Closing_${new Date().toISOString().split('T')[0]}`);
+
+                        // 2. Clear Database
+                        await OrderService.deleteAllOrders();
+                        await PaymentService.deleteAllPayments();
+
+                        // 3. Notify Success
+                        toast.success("تم إغلاق اليوم وتنزيل التقرير بنجاح");
+                    } catch (error) {
+                        toast.error("حدث خطأ أثناء إغلاق اليوم");
+                        throw error;
+                    }
                 }}
             />
         </div >
