@@ -130,7 +130,16 @@ export default function PaymentFlow({
                                     className="relative p-6 rounded-4xl border-2 border-gray-100 bg-white hover:border-primary hover:bg-primary/5 transition-all flex flex-col items-center gap-4 group shadow-soft hover:shadow-premium active:scale-95"
                                 >
                                     <div className="w-20 h-20 rounded-3xl overflow-hidden bg-white shadow-soft flex items-center justify-center border border-gray-50 shrink-0 group-hover:scale-105 transition-transform duration-500">
-                                        {(method.logoUrl || method.image) ? (
+                                        {/* Priority: 1. React Component Icon, 2. logoUrl/image string, 3. Fallback */}
+                                        {method.icon ? (
+                                            typeof method.icon === 'string' ? (
+                                                <img 
+                                                    src={method.icon.startsWith('/') ? method.icon : `/images/payment/${method.icon}`} 
+                                                    alt={method.name} 
+                                                    className="w-full h-full object-contain p-3" 
+                                                />
+                                            ) : <method.icon size={28} className="text-primary" />
+                                        ) : (method.logoUrl || method.image) ? (
                                             <img
                                                 src={method.logoUrl || (method.image?.startsWith('/') ? method.image : `/images/payment/${method.image}`)}
                                                 alt={method.name}
@@ -140,7 +149,7 @@ export default function PaymentFlow({
                                             <FiDollarSign size={28} className="text-gray-200" />
                                         )}
                                     </div>
-                                    <span className="font-black text-base text-gray-700 group-hover:text-primary transition-colors">{method.name}</span>
+                                    <span className="font-black text-base text-gray-700 group-hover:text-primary transition-colors">{method.label || method.name}</span>
                                     <div className="absolute top-4 right-4 w-7 h-7 rounded-full border-2 border-gray-100 group-hover:border-primary group-hover:bg-primary transition-all flex items-center justify-center">
                                         <FiChevronRight size={12} className="text-gray-200 group-hover:text-white" />
                                     </div>
@@ -258,11 +267,24 @@ export default function PaymentFlow({
                         <div className="bg-white border border-gray-100 rounded-3xl p-5 space-y-4 shadow-sm">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-xl bg-white border border-gray-100 shadow flex items-center justify-center p-1.5">
-                                    {(selectedMethod.logoUrl || selectedMethod.image) ? (
-                                        <img src={selectedMethod.logoUrl || `/images/payment/${selectedMethod.image}`} alt="" className="w-full h-full object-contain" />
+                                    {/* Priority: 1. React Component Icon, 2. logoUrl/image string, 3. Fallback */}
+                                    {selectedMethod.icon ? (
+                                        typeof selectedMethod.icon === 'string' ? (
+                                            <img 
+                                                src={selectedMethod.icon.startsWith('/') ? selectedMethod.icon : `/images/payment/${selectedMethod.icon}`} 
+                                                alt="" 
+                                                className="w-full h-full object-contain" 
+                                            />
+                                        ) : <selectedMethod.icon size={20} className="text-primary" />
+                                    ) : (selectedMethod.logoUrl || selectedMethod.image) ? (
+                                        <img 
+                                            src={selectedMethod.logoUrl || (selectedMethod.image?.startsWith('/') ? selectedMethod.image : `/images/payment/${selectedMethod.image}`)} 
+                                            alt="" 
+                                            className="w-full h-full object-contain" 
+                                        />
                                     ) : <FiDollarSign className="text-gray-300" />}
                                 </div>
-                                <span className="text-sm font-black text-gray-800">{selectedMethod.name}</span>
+                                <span className="text-sm font-black text-gray-800">{selectedMethod.label || selectedMethod.name}</span>
                             </div>
                             <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
                                 {[

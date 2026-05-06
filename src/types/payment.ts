@@ -10,6 +10,8 @@ export interface PaymentMethod {
     id: string;
     type: "cash" | "bank";
     name: string;
+    label?: string;   // Added support for label
+    icon?: any;        // Added support for icon (can be React Component or string path)
     image?: string;
     logoUrl?: string;
     instructions?: string;
