@@ -7,14 +7,6 @@ import type { PaymentMethod, PaymentField } from "../../types/payment";
 import { toast } from "react-hot-toast";
 import FeaturedGallery from "./FeaturedGallery";
 
-const imageModules = import.meta.glob('/public/images/payment/*', {
-    eager: true,
-    query: '?url',
-    import: 'default'
-});
-const paymentImages = Object.values(imageModules)
-    .map(url => (url as string).replace('/public', ''));
-
 interface Props {
     isOpen: boolean;
     onClose: () => void;
@@ -26,6 +18,15 @@ export default function PaymentMethodsModal({ isOpen, onClose }: Props) {
     const [editingMethod, setEditingMethod] = useState<Partial<PaymentMethod> | null>(null);
     const [loading, setLoading] = useState(true);
     const [showGallery, setShowGallery] = useState(false);
+    const [paymentImages, setPaymentImages] = useState<string[]>([]);
+
+    useEffect(() => {
+        // Fetch the manifest instead of using glob (per strict frontend requirements)
+        fetch('/images/payment/manifest.json')
+            .then(res => res.json())
+            .then(data => setPaymentImages(data))
+            .catch(err => console.error("Could not load payment manifest", err));
+    }, []);
 
     useEffect(() => {
         if (!isOpen) return;

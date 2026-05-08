@@ -21,7 +21,7 @@ export default function PaymentMethodsDisplay() {
 
     const activeMethods = useMemo(() => {
         return methods
-            .filter(m => m.isActive)
+            .filter(m => m.isEnabled)
             .sort((a, b) => (a.order || 0) - (b.order || 0));
     }, [methods]);
 
@@ -101,7 +101,7 @@ export default function PaymentMethodsDisplay() {
 
                     {/* Fields */}
                     <div className="divide-y divide-(--border-color)">
-                        {method.fields.map((field) => {
+                        {method.fields?.map((field) => {
                             const isCopied = copiedField === field.id;
                             return (
                                 <div

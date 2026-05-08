@@ -25,15 +25,6 @@ import type { PopupState, Category, Item, Subcategory } from "./types";
 import FeaturedGallery from "./FeaturedGallery";
 import CustomSelect from "./CustomSelect";
 
-/* ================== auto load feature images ================== */
-const galleryImages = Object.keys(
-  import.meta.glob("/images/*", {
-    eager: true,
-    query: "?url",
-    import: 'default'
-
-  })
-).map((path) => path.replace("/images/", ""));
 
 interface Props {
   categories: Record<string, Category>;
@@ -596,7 +587,7 @@ const ItemSection: React.FC<Props> = ({ categories, subcategories, items, setPop
         visible={showGallery}
         onClose={() => setShowGallery(false)}
         onSelect={handleSelectImage}
-        galleryImages={galleryImages}
+        manifestPath="/images/manifest.json"
         selectedImage={itemImage}
       />
     </div>

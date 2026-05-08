@@ -8,7 +8,8 @@ interface Props {
     visible: boolean;
     onClose: () => void;
     onSelect: (img: string) => void;
-    galleryImages: string[];
+    galleryImages?: string[]; // Optional now
+    manifestPath?: string;    // New: Path to JSON manifest
     selectedImage?: string;
     title?: string;
     basePath?: string;
@@ -19,14 +20,38 @@ const FeaturedGallery: React.FC<Props> = ({
     visible,
     onClose,
     onSelect,
-    galleryImages,
+    galleryImages = [],
+    manifestPath,
     selectedImage,
     title,
+    basePath = "/images/",
     returnFullPath = false
 }) => {
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [localImages, setLocalImages] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Fetch images from manifest if provided
+    useEffect(() => {
+        if (visible && manifestPath) {
+            setIsLoading(true);
+            fetch(manifestPath)
+                .then(res => res.json())
+                .then(data => {
+                    setLocalImages(data);
+                    setIsLoading(false);
+                })
+                .catch(err => {
+                    console.error("Gallery failed to load manifest:", err);
+                    setIsLoading(false);
+                });
+        }
+    }, [visible, manifestPath]);
+
+    // Use either provided images or fetched images
+    const activeImages = galleryImages.length > 0 ? galleryImages : localImages;
 
     // Debounce search input
     useEffect(() => {
@@ -36,15 +61,20 @@ const FeaturedGallery: React.FC<Props> = ({
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
-
-    // This is a function that takes a filename and returns the full URL
     const getFullSrc = (img: string) => {
         if (!img) return "/logo.png";
+
         if (img.startsWith("http")) return img;
-        return `/images/${img}`;
+
+        if (img.startsWith("/")) {
+            return img.replace(/^\/?public\//, "/").replace(/\/+/g, "/");
+        }
+
+        const normalizedBase = basePath.endsWith("/") ? basePath : `${basePath}/`;
+        return `${normalizedBase}${img}`.replace(/\/+/g, "/");
     };
 
-    const filteredImages = galleryImages.filter((img) => {
+    const filteredImages = activeImages.filter((img) => {
         const fullPath = getFullSrc(img).toLowerCase();
         const search = debouncedSearch.toLowerCase();
         return fullPath.includes(search) || img.toLowerCase().includes(search);
@@ -60,7 +90,6 @@ const FeaturedGallery: React.FC<Props> = ({
 
     const modalContent = (
         <div className="fixed inset-0 z-10001 flex items-center justify-center p-4 md:p-6">
-            {/* Backdrop */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -69,14 +98,12 @@ const FeaturedGallery: React.FC<Props> = ({
                 className="absolute inset-0 bg-gray-900/60 backdrop-blur-md z-10000"
             />
 
-            {/* Modal Content */}
             <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 className="relative bg-white w-full max-w-4xl rounded-[2.5rem] border border-gray-100 shadow-premium flex flex-col max-h-[90vh] overflow-hidden z-10001 pointer-events-auto"
             >
-                {/* Header */}
                 <div className="p-6 md:p-8 border-b border-gray-100 bg-gray-50/50 space-y-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-5">
@@ -93,7 +120,6 @@ const FeaturedGallery: React.FC<Props> = ({
                         </button>
                     </div>
 
-                    {/* Search Input */}
                     <div className="relative group">
                         <FiSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary transition-colors" size={20} />
                         <input
@@ -110,7 +136,12 @@ const FeaturedGallery: React.FC<Props> = ({
                 <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar bg-gray-50/30">
                     <motion.div layout className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 md:gap-6">
                         <AnimatePresence mode="popLayout">
-                            {filteredImages.map((img) => {
+                            {isLoading ? (
+                                // Loading Skeleton
+                                [...Array(10)].map((_, i) => (
+                                    <div key={`skeleton-${i}`} className="aspect-square bg-gray-100 rounded-3xl animate-pulse" />
+                                ))
+                            ) : filteredImages.map((img) => {
                                 const fullUrl = getFullSrc(img);
                                 const isSelected = selectedImage === img || selectedImage === fullUrl;
                                 return (
