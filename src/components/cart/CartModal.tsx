@@ -51,7 +51,7 @@ export default function CartModal({ isOpen, onClose }: { isOpen: boolean; onClos
             );
         });
         const unsubMethods = PaymentService.listenToPaymentMethods((methods) => {
-            setPaymentMethods(methods.filter(m => m.isActive));
+            setPaymentMethods(methods.filter(m => m.isEnabled));
         });
         return () => { unsubSettings(); unsubMethods(); };
     }, []);
@@ -216,7 +216,7 @@ export default function CartModal({ isOpen, onClose }: { isOpen: boolean; onClos
                 toast.success(t('common.order_saved_success'));
                 updateOrderId(cleanId);
                 setIsFullTrackingOpen(true);
-                setTimeout(() => { clearCart(); setStep("items"); }, 1000);
+                setTimeout(() => { clearCart(); setStep("items"); onClose(); }, 1000);
             }
         } catch (error) {
             console.error(error);

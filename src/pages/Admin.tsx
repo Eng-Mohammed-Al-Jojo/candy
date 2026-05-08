@@ -3,7 +3,7 @@ import { db, auth } from "../firebase";
 import { ref, onValue, remove, update, get, set, push } from "firebase/database";
 import {
   FiDownload, FiSettings, FiUpload, FiLogOut, FiPackage,
-  FiLayout, FiDatabase, FiLock, FiMail, FiUser
+  FiLayout, FiDatabase, FiLock, FiMail, FiUser, FiDollarSign
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -25,6 +25,7 @@ import ItemSection from "../components/admin/ItemSection";
 import Popup from "../components/admin/Popup";
 import { type PopupState } from "../components/admin/types";
 import OrderSettingsModal from "../components/admin/OrderSettingsModal";
+import PaymentMethodsModal from "../components/admin/PaymentMethodsModal";
 
 
 export default function Admin() {
@@ -61,6 +62,7 @@ export default function Admin() {
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const [loading, setLoading] = useState(false);
   const [showOrderSettings, setShowOrderSettings] = useState(false);
+  const [showPaymentMethods, setShowPaymentMethods] = useState(false);
   const [orderSettings, setOrderSettings] = useState<any>(null);
   const [settings, setSettings] = useState({
     orderSystem: false,
@@ -467,6 +469,10 @@ export default function Admin() {
               <button onClick={exportToJSON} className="w-11 h-11 flex items-center justify-center rounded-xl hover:bg-white hover:text-secondary-600 hover:shadow-sm text-gray-400 transition-all" title={t('admin.backup')}>
                 <FiDatabase size={20} />
               </button>
+              <div className="w-px h-6 bg-gray-200 mx-1" />
+              <button onClick={() => setShowPaymentMethods(true)} className="w-11 h-11 flex items-center justify-center rounded-xl hover:bg-white hover:text-primary hover:shadow-sm text-gray-400 transition-all" title={t('admin.payment_methods')}>
+                <FiDollarSign size={20} />
+              </button>
             </div>
 
             <button
@@ -563,13 +569,19 @@ export default function Admin() {
           handleResetPassword={handleResetPassword}
         />
 
-        {showOrderSettings && orderSettings && (
+        {showOrderSettings && (
           <OrderSettingsModal
-            setShowOrderSettings={setShowOrderSettings}
-            orderSettings={orderSettings}
+            isOpen={showOrderSettings}
+            onClose={() => setShowOrderSettings(false)}
+            settings={orderSettings}
             onSave={handleSaveOrderSettings}
           />
         )}
+
+        <PaymentMethodsModal
+          isOpen={showPaymentMethods}
+          onClose={() => setShowPaymentMethods(false)}
+        />
 
         {/* Notifications */}
         <AnimatePresence>

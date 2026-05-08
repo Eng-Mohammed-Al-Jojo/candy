@@ -33,13 +33,17 @@ export const PaymentService = {
         });
     },
 
+    subscribeToPaymentMethods(callback: (methods: PaymentMethod[]) => void) {
+        return this.listenToPaymentMethods(callback);
+    },
+
     async savePaymentMethod(method: Partial<PaymentMethod>) {
         const id = method.id || `pm_${Date.now()}`;
         const data = {
             ...method,
             id,
             createdAt: method.createdAt || Date.now(),
-            isActive: method.isActive !== undefined ? method.isActive : true
+            isEnabled: method.isEnabled !== undefined ? method.isEnabled : true
         };
         return FirebaseService.update(`paymentMethods/${id}`, data);
     },

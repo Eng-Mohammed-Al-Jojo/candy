@@ -1,6 +1,4 @@
-export type PaymentMethodStatus = "active" | "inactive";
-
-export interface PaymentMethodField {
+export interface PaymentField {
     id: string;
     label: string;
     value: string;
@@ -8,16 +6,20 @@ export interface PaymentMethodField {
 
 export interface PaymentMethod {
     id: string;
-    type: "cash" | "bank";
     name: string;
-    label?: string;   // Added support for label
-    icon?: any;        // Added support for icon (can be React Component or string path)
-    image?: string;
-    logoUrl?: string;
-    instructions?: string;
-    isActive: boolean;
+    type: "cash" | "bank" | "wallet";
+    image?: string; // Kept as image to match existing logic, but UI will refer to it as image
+    imageUrl?: string; // Added as requested
+
+    paymentFields: PaymentField[];
+
+    isEnabled: boolean;
+    showPaymentDetails: boolean;
+
+    // Deprecated
+    details?: string;
+    fields?: PaymentField[]; // Compatibility with old 'fields' name
     order?: number;
-    fields: PaymentMethodField[];
     createdAt?: number;
 }
 

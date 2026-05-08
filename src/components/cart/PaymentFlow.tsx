@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 import {
     FiCheck, FiDollarSign, FiInfo, FiArrowRight, FiArrowLeft,
     FiUser, FiHash, FiMessageSquare, FiAlertTriangle,
-    FiShoppingCart, FiClock, FiAlertCircle, FiChevronRight, FiCopy
+    FiShoppingCart, FiClock, FiAlertCircle, FiChevronRight
 } from "react-icons/fi";
 import type { PaymentMethod, PaymentRecord } from "../../types/payment";
-import { toast } from "react-hot-toast";
+import PaymentFieldsRenderer from "../common/PaymentFieldsRenderer";
 
 type Step = "SELECT" | "FORM" | "CONFIRM" | "RESULT";
 
@@ -41,8 +41,8 @@ export default function PaymentFlow({
 
     const handleSelectMethod = (method: PaymentMethod) => {
         onSelectMethod(method);
-        if (method.type === 'cash') {
-            // Immediate submission for cash with null details
+        
+        if (!method.showPaymentDetails) {
             onSubmit({
                 methodName: method.name,
                 senderAccountName: null,
@@ -50,39 +50,29 @@ export default function PaymentFlow({
                 receiverAccountName: null,
                 receiverAccountNumber: null,
                 senderBankOrWallet: null,
-                notes: "Cash Payment"
+                notes: `Direct Payment - ${method.name}`
             }, method);
-            return; // EXIT IMMEDIATELY - Bypass all steps
+            return;
         } else {
             setStep("FORM");
         }
     };
 
-    const copyToClipboard = (text: string) => {
-        navigator.clipboard.writeText(text).then(() => {
-            toast.success(t('common.copied_to_clipboard') || "تم النسخ بنجاح");
-        });
+    const handleBack = () => { 
+        if (step === "FORM") setStep("SELECT"); 
+        if (step === "CONFIRM") setStep("FORM"); 
     };
 
-    const CopyButton = ({ text }: { text: string }) => (
-        <button
-            onClick={() => copyToClipboard(text)}
-            className="w-8 h-8 rounded-lg bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center group/copy"
-            title={t('common.copy')}
-        >
-            <FiCopy size={14} className="group-hover/copy:scale-110 transition-transform" />
-        </button>
-    );
-    const handleBack = () => { if (step === "FORM") setStep("SELECT"); if (step === "CONFIRM") setStep("FORM"); };
     const handleNext = () => {
-        if (step === "FORM" && formData.senderAccountName && formData.senderAccountNumber && formData.senderBankOrWallet) setStep("CONFIRM");
+        if (step === "FORM" && formData.senderAccountName && formData.senderAccountNumber && formData.senderBankOrWallet) {
+            setStep("CONFIRM");
+        }
     };
 
     const currentStep = paymentRecord ? "RESULT" : step;
     const STEPS = ["SELECT", "FORM", "CONFIRM"];
     const stepIdx = STEPS.indexOf(currentStep);
 
-    // Shared styles — match admin dashboard
     const inputCls = `w-full bg-white border border-gray-200 rounded-2xl py-3.5 px-5 text-sm font-bold text-gray-900 placeholder:text-gray-400 outline-none focus:border-primary focus:ring-4 focus:ring-primary/8 transition-all shadow-sm`;
     const inputWithIcon = (rtl: boolean) => inputCls + (rtl ? ' pr-11 pl-5' : ' pl-11 pr-5');
 
@@ -130,18 +120,9 @@ export default function PaymentFlow({
                                     className="relative p-6 rounded-4xl border-2 border-gray-100 bg-white hover:border-primary hover:bg-primary/5 transition-all flex flex-col items-center gap-4 group shadow-soft hover:shadow-premium active:scale-95"
                                 >
                                     <div className="w-20 h-20 rounded-3xl overflow-hidden bg-white shadow-soft flex items-center justify-center border border-gray-50 shrink-0 group-hover:scale-105 transition-transform duration-500">
-                                        {/* Priority: 1. React Component Icon, 2. logoUrl/image string, 3. Fallback */}
-                                        {method.icon ? (
-                                            typeof method.icon === 'string' ? (
-                                                <img 
-                                                    src={method.icon.startsWith('/') ? method.icon : `/images/payment/${method.icon}`} 
-                                                    alt={method.name} 
-                                                    className="w-full h-full object-contain p-3" 
-                                                />
-                                            ) : <method.icon size={28} className="text-primary" />
-                                        ) : (method.logoUrl || method.image) ? (
+                                        {(method.image || method.imageUrl) ? (
                                             <img
-                                                src={method.logoUrl || (method.image?.startsWith('/') ? method.image : `/images/payment/${method.image}`)}
+                                                src={(method.image || method.imageUrl)?.startsWith('/') ? (method.image || method.imageUrl) : `/images/payment/${method.image || method.imageUrl}`}
                                                 alt={method.name}
                                                 className="w-full h-full object-contain p-3"
                                             />
@@ -149,7 +130,7 @@ export default function PaymentFlow({
                                             <FiDollarSign size={28} className="text-gray-200" />
                                         )}
                                     </div>
-                                    <span className="font-black text-base text-gray-700 group-hover:text-primary transition-colors">{method.label || method.name}</span>
+                                    <span className="font-black text-base text-gray-700 group-hover:text-primary transition-colors">{method.name}</span>
                                     <div className="absolute top-4 right-4 w-7 h-7 rounded-full border-2 border-gray-100 group-hover:border-primary group-hover:bg-primary transition-all flex items-center justify-center">
                                         <FiChevronRight size={12} className="text-gray-200 group-hover:text-white" />
                                     </div>
@@ -172,27 +153,17 @@ export default function PaymentFlow({
                             </div>
                         </div>
 
-                        {/* Account Info Card */}
-                        {(selectedMethod.fields?.length > 0 || selectedMethod.instructions) && (
-                            <div className="bg-primary-50 border border-primary-100 rounded-3xl p-5 space-y-3">
-                                <div className="flex items-center gap-2 text-primary text-xs font-black uppercase tracking-widest">
-                                    <FiInfo size={14} />
-                                    <span>{t('admin.account_details')}</span>
-                                </div>
-                                {selectedMethod.instructions && (
-                                    <p className="text-xs font-bold text-gray-600 leading-relaxed">{selectedMethod.instructions}</p>
-                                )}
-                                {selectedMethod.fields?.map((field, idx) => (
-                                    <div key={idx} className="flex justify-between items-center py-2 border-b border-primary-100 last:border-0 gap-3">
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] font-bold text-gray-400 uppercase">{field.label}</span>
-                                            <span className="text-sm font-black text-primary select-all">{field.value}</span>
-                                        </div>
-                                        <CopyButton text={field.value} />
-                                    </div>
-                                ))}
+                        {/* Account Info Cards */}
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-primary text-xs font-black uppercase tracking-widest px-1">
+                                <FiInfo size={14} />
+                                <span>{t('admin.account_details')}</span>
                             </div>
-                        )}
+                            <PaymentFieldsRenderer 
+                                fields={selectedMethod.paymentFields || []} 
+                                isCash={selectedMethod.type === 'cash'} 
+                            />
+                        </div>
 
                         {/* Warning */}
                         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-3">
@@ -211,7 +182,7 @@ export default function PaymentFlow({
                             </div>
                             <div className="relative">
                                 <FiCheck className={`absolute top-1/2 -translate-y-1/2 text-gray-400 ${isRtl ? 'right-5' : 'left-5'}`} size={18} />
-                                <input placeholder={t('common.sender_bank_wallet') || "Sender Bank/Wallet"} className={inputWithIcon(isRtl)} value={formData.senderBankOrWallet} onChange={e => setFormData({ ...formData, senderBankOrWallet: e.target.value })} />
+                                <input placeholder={t('common.sender_bank_wallet') || "مصدر التحويل (بنك/محفظة)"} className={inputWithIcon(isRtl)} value={formData.senderBankOrWallet} onChange={e => setFormData({ ...formData, senderBankOrWallet: e.target.value })} />
                             </div>
                             <div className="relative">
                                 <FiMessageSquare className={`absolute ${isRtl ? 'right-5' : 'left-5'} top-5 text-gray-400`} size={18} />
@@ -267,24 +238,15 @@ export default function PaymentFlow({
                         <div className="bg-white border border-gray-100 rounded-3xl p-5 space-y-4 shadow-sm">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-xl bg-white border border-gray-100 shadow flex items-center justify-center p-1.5">
-                                    {/* Priority: 1. React Component Icon, 2. logoUrl/image string, 3. Fallback */}
-                                    {selectedMethod.icon ? (
-                                        typeof selectedMethod.icon === 'string' ? (
-                                            <img 
-                                                src={selectedMethod.icon.startsWith('/') ? selectedMethod.icon : `/images/payment/${selectedMethod.icon}`} 
-                                                alt="" 
-                                                className="w-full h-full object-contain" 
-                                            />
-                                        ) : <selectedMethod.icon size={20} className="text-primary" />
-                                    ) : (selectedMethod.logoUrl || selectedMethod.image) ? (
+                                    {(selectedMethod.image || selectedMethod.imageUrl) ? (
                                         <img 
-                                            src={selectedMethod.logoUrl || (selectedMethod.image?.startsWith('/') ? selectedMethod.image : `/images/payment/${selectedMethod.image}`)} 
+                                            src={(selectedMethod.image || selectedMethod.imageUrl)?.startsWith('/') ? (selectedMethod.image || selectedMethod.imageUrl) : `/images/payment/${selectedMethod.image || selectedMethod.imageUrl}`} 
                                             alt="" 
                                             className="w-full h-full object-contain" 
                                         />
                                     ) : <FiDollarSign className="text-gray-300" />}
                                 </div>
-                                <span className="text-sm font-black text-gray-800">{selectedMethod.label || selectedMethod.name}</span>
+                                <span className="text-sm font-black text-gray-800">{selectedMethod.name}</span>
                             </div>
                             <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
                                 {[
