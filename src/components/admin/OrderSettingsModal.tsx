@@ -108,7 +108,7 @@ function ServiceCheckbox({ title, enabled, onToggle, value, setValue, disabled, 
 }
 
 /* ================= Modal ================= */
-export default function OrderSettingsModal({ setShowOrderSettings, orderSettings: initialSettings, onSave }: any) {
+export default function OrderSettingsModal({ onClose, settings: initialSettings, onSave }: any) {
     const { t, i18n } = useTranslation();
     const isRtl = i18n.language === 'ar';
     const [orderSystem, setOrderSystem] = useState(true);
@@ -174,7 +174,7 @@ export default function OrderSettingsModal({ setShowOrderSettings, orderSettings
             await update(ref(db, "settings"), newSettings);
             onSave?.(newSettings);
             setToast({ type: "success", message: t('admin.settings_saved_success') });
-            setTimeout(() => setShowOrderSettings(false), 1500);
+            setTimeout(() => onClose(), 1500);
         } catch (error) {
             setToast({ type: "error", message: t('admin.settings_save_error') });
             setSaving(false);
@@ -183,7 +183,7 @@ export default function OrderSettingsModal({ setShowOrderSettings, orderSettings
 
     return (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowOrderSettings(false)} className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => onClose()} className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" />
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -203,7 +203,7 @@ export default function OrderSettingsModal({ setShowOrderSettings, orderSettings
                         </div>
                     </div>
                     <button
-                        onClick={() => setShowOrderSettings(false)}
+                        onClick={() => onClose()}
                         className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white text-gray-400 hover:text-secondary hover:bg-secondary/10 transition-all border border-gray-100 shadow-soft"
                     >
                         <FiX size={24} />
