@@ -25,8 +25,7 @@ export default function CategorySection({ category, subcategories, items, orderS
 
     items.forEach(item => {
       const sub = subcategories.find(s => s.id === item.subcategoryId);
-      if (item.subcategoryId && sub) {
-        if (sub.visible === false) return;
+      if (item.subcategoryId && sub && sub.visible !== false) {
         if (!groups[item.subcategoryId]) groups[item.subcategoryId] = [];
         groups[item.subcategoryId].push(item);
       } else {
@@ -42,8 +41,6 @@ export default function CategorySection({ category, subcategories, items, orderS
       .filter(sub => sub.categoryId === category.id && sub.visible !== false && groupedItems.groups[sub.id])
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   }, [category.id, subcategories, groupedItems.groups]);
-
-  if (category.visible === false) return null;
 
   const catName = category.nameAr || category.name || "";
 
@@ -65,7 +62,8 @@ export default function CategorySection({ category, subcategories, items, orderS
             initial="hidden"
             whileInView="show"
             viewport={{ once: true }}
-            className="flex flex-col w-full"
+            layout
+            className="flex flex-col w-full gap-4"
           >
             {groupedItems.noSubItems.map((item) => (
               <ItemRow
@@ -102,7 +100,8 @@ export default function CategorySection({ category, subcategories, items, orderS
               initial="hidden"
               whileInView="show"
               viewport={{ once: true }}
-              className="flex flex-col w-full"
+              layout
+              className="flex flex-col w-full gap-4"
             >
               {groupedItems.groups[sub.id].map((item) => (
                 <ItemRow

@@ -4,7 +4,6 @@ import React, {
 import { type Item } from "./Menu";
 import { FaFire } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
 import { FiShoppingCart } from "react-icons/fi";
 
 interface Props {
@@ -16,7 +15,6 @@ interface Props {
 
 const ItemRow = React.memo(
   ({ item, orderSystem, onClick }: Props) => {
-    const { t } = useTranslation();
 
     const prices = String(item.price).split(",");
     const basePrice = Number(prices[0]);
@@ -24,7 +22,6 @@ const ItemRow = React.memo(
     const itemName = item.nameAr || item.name || "";
     const description = item.ingredientsAr || item.ingredients || "";
     const canOrder = !unavailable && orderSystem;
-
     const handleOrderClick = useCallback(
       (e: React.MouseEvent) => {
         e.preventDefault();
@@ -36,16 +33,19 @@ const ItemRow = React.memo(
 
     return (
       <motion.div
-        initial={{ opacity: 0, x: 20 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        viewport={{ once: true, margin: "50px" }}
         className={`
-          relative flex items-center justify-between w-full rounded-3xl border border-primary-200
-          h-[100px] pr-27 pl-2 bg-white mb-8 mr-2
+          relative flex items-center justify-between w-full rounded-3xl border
+          h-[110px] pr-27 pl-4 bg-white
           transition-all duration-300 group
-          ${unavailable ? "opacity-60 grayscale mt-10 mb-10" : "hover:bg-gray-50/50 cursor-pointer"}
+          ${unavailable
+            ? "opacity-40 grayscale cursor-not-allowed border-gray-100 bg-gray-50/30 pointer-events-none"
+            : "border-primary-200 hover:bg-gray-50/50 cursor-pointer"
+          }
         `}
+        layout
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
         onClick={handleOrderClick}
       >
         {/* IMAGE (RIGHT SIDE, ABSOLUTE, OVERFLOW) */}
@@ -59,6 +59,15 @@ const ItemRow = React.memo(
               (e.target as HTMLImageElement).src = "/logo.png";
             }}
           />
+
+          {/* SOLD OUT OVERLAY */}
+          {unavailable && (
+            <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
+              <span className="text-[10px] font-black text-white text-center leading-tight">
+                لقد نفذت<br />الكمية
+              </span>
+            </div>
+          )}
 
           {/* FEATURED BADGE */}
           {(item.star || (item as any).isFeatured) && !unavailable && (
@@ -80,7 +89,7 @@ const ItemRow = React.memo(
 
         {/* LEFT SECTION (PRICE + BUTTON) */}
         <div className="flex flex-col items-end gap-2.5 shrink-0 min-w-[90px] pl-2">
-          <div className="text-[#355152] font-black text-xl flex items-center gap-0.5">
+          <div className={`font-black text-xl flex items-center gap-0.5 ${unavailable ? "text-gray-400 line-through" : "text-[#355152]"}`}>
             <span className="text-sm font-bold opacity-60">₪</span>
             {basePrice}
           </div>
@@ -95,8 +104,8 @@ const ItemRow = React.memo(
           )}
 
           {unavailable && (
-            <span className="bg-gray-100 text-gray-400 px-3 py-1 rounded-full text-[10px] font-bold">
-              {t("common.unavailable")}
+            <span className="bg-red-50 text-red-400 border border-red-200 px-3 py-1 rounded-full text-[10px] font-bold whitespace-nowrap">
+              لقد نفذت الكمية
             </span>
           )}
         </div>

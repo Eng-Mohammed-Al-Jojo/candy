@@ -119,7 +119,7 @@ export default function Menu({ onLoadingChange, onFeaturedCheck, onFeaturedItems
         setOrderSystem(data.orderSystem);
 
         const availableWithItems = data.categories.filter((cat: any) =>
-          cat.available && data.items.some((i: any) => i.categoryId === cat.id && i.visible !== false)
+          cat.available && data.items.some((i: any) => i.categoryId === cat.id)
         );
 
         if (availableWithItems.length > 0 && (!activeCategoryId || activeCategoryId === "all")) {
@@ -167,16 +167,21 @@ export default function Menu({ onLoadingChange, onFeaturedCheck, onFeaturedItems
 
   /* ================= Derived Data (Optimized) ================= */
   const featuredItems = useMemo(() =>
-    items.filter(i => (i.star === true || (i as any).isFeatured === true) && i.visible !== false),
+    items
+      .filter(i => (i.star === true || (i as any).isFeatured === true))
+      .sort((a, b) => {
+        if (a.visible === false && b.visible !== false) return 1;
+        if (a.visible !== false && b.visible === false) return -1;
+        return (a.order ?? 0) - (b.order ?? 0);
+      }),
     [items]
   );
 
   const availableCategories = useMemo(() => {
     return categories
       .filter(cat => {
-        if (!cat.available) return false;
-        // Smart Filter: Ensure the category has at least one visible item
-        return items.some(i => i.categoryId === cat.id && i.visible !== false);
+        // Show category if it has at least one item, even if unavailable
+        return items.some(i => i.categoryId === cat.id);
       })
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   }, [categories, items]);
@@ -184,11 +189,17 @@ export default function Menu({ onLoadingChange, onFeaturedCheck, onFeaturedItems
   const filteredItems = useMemo(() => {
     const search = searchTerm?.toLowerCase() ?? "";
     if (!search) return [];
-    return items.filter((item) => {
-      const name = (item.nameAr || item.name || "").toLowerCase();
-      const ingredients = (item.ingredientsAr || item.ingredients || "").toLowerCase();
-      return name.includes(search) || ingredients.includes(search);
-    });
+    return items
+      .filter((item) => {
+        const name = (item.nameAr || item.name || "").toLowerCase();
+        const ingredients = (item.ingredientsAr || item.ingredients || "").toLowerCase();
+        return name.includes(search) || ingredients.includes(search);
+      })
+      .sort((a, b) => {
+        if (a.visible === false && b.visible !== false) return 1;
+        if (a.visible !== false && b.visible === false) return -1;
+        return (a.order ?? 0) - (b.order ?? 0);
+      });
   }, [items, searchTerm]);
 
   useEffect(() => {
@@ -281,8 +292,8 @@ export default function Menu({ onLoadingChange, onFeaturedCheck, onFeaturedItems
                   variants={containerVariants}
                   initial="hidden"
                   animate="show"
-                  exit="exit"
-                  className="flex flex-col w-full"
+                  layout
+                  className="flex flex-col w-full gap-4"
                 >
                   {filteredItems.map((item) => (
                     <ItemRow key={item.id} item={item} orderSystem={orderSystem} onClick={handleItemClick} onDetailsClick={onDetailsClick} />
@@ -320,7 +331,14 @@ export default function Menu({ onLoadingChange, onFeaturedCheck, onFeaturedItems
                         key={cat.id}
                         category={cat}
                         subcategories={subcategories}
-                        items={items.filter(i => i.categoryId === cat.id && i.visible !== false)}
+                        items={
+                          [...items.filter(i => i.categoryId === cat.id)]
+                            .sort((a, b) => {
+                              if (a.visible === false && b.visible !== false) return 1;
+                              if (a.visible !== false && b.visible === false) return -1;
+                              return (a.order ?? 0) - (b.order ?? 0);
+                            })
+                        }
                         orderSystem={orderSystem}
                         onItemClick={handleItemClick}
                         onDetailsClick={onDetailsClick}
@@ -331,7 +349,14 @@ export default function Menu({ onLoadingChange, onFeaturedCheck, onFeaturedItems
                       <CategorySection
                         category={activeCategory}
                         subcategories={subcategories}
-                        items={items.filter(i => i.categoryId === activeCategoryId && i.visible !== false)}
+                        items={
+                          [...items.filter(i => i.categoryId === activeCategoryId)]
+                            .sort((a, b) => {
+                              if (a.visible === false && b.visible !== false) return 1;
+                              if (a.visible !== false && b.visible === false) return -1;
+                              return (a.order ?? 0) - (b.order ?? 0);
+                            })
+                        }
                         orderSystem={orderSystem}
                         onItemClick={handleItemClick}
                         onDetailsClick={onDetailsClick}
