@@ -182,7 +182,7 @@ export default function OrderSettingsModal({ onClose, settings: initialSettings,
     };
 
     return (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => onClose()} className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" />
 
             <motion.div
@@ -192,7 +192,7 @@ export default function OrderSettingsModal({ onClose, settings: initialSettings,
                 className="relative bg-white w-full max-w-2xl rounded-[3rem] border border-gray-100 shadow-premium flex flex-col max-h-[90vh] overflow-hidden z-10"
             >
                 {/* Header */}
-                <div className="p-10 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
                     <div className="flex items-center gap-6">
                         <div className="w-16 h-16 rounded-3xl bg-primary text-white flex items-center justify-center text-3xl shadow-xl shadow-primary/20">
                             <FiSettings />
@@ -211,7 +211,7 @@ export default function OrderSettingsModal({ onClose, settings: initialSettings,
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-10 space-y-10 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-6 space-y-10 custom-scrollbar">
                     {/* Order Module Toggle */}
                     <div className="p-8 rounded-4xl bg-primary/5 border border-primary/10 flex items-center justify-between shadow-sm">
                         <div className="flex items-center gap-5">
@@ -341,7 +341,7 @@ export default function OrderSettingsModal({ onClose, settings: initialSettings,
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 gap-6">
                                 <div className="relative group">
                                     <FaFacebook className={`absolute ${isRtl ? 'right-5' : 'left-5'} top-1/2 -translate-y-1/2 text-gray-300 transition-colors group-focus-within:text-blue-600`} />
                                     <input placeholder="FB" value={footer.facebook} onChange={(e) => setFooter({ ...footer, facebook: e.target.value })} className={`${inputClass} ${isRtl ? 'pr-14 pl-2' : 'pl-14 pr-2'} bg-white! shadow-soft text-xs`} />

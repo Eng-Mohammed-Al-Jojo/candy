@@ -135,7 +135,7 @@ export default function PaymentMethodsModal({ isOpen, onClose }: Props) {
                             </div>
 
                             {/* Content */}
-                            <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
+                            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                                     {/* Methods List */}
                                     <div className="space-y-6">
@@ -215,7 +215,7 @@ export default function PaymentMethodsModal({ isOpen, onClose }: Props) {
                                     </div>
 
                                     {/* Editor Form */}
-                                    <div className="bg-gray-50 p-10 rounded-[3rem] border border-gray-100 h-fit sticky top-0 shadow-inner">
+                                    <div className="bg-gray-50 p-4 rounded-[3rem] border border-gray-100 h-fit sticky top-0 shadow-inner">
                                         <AnimatePresence mode="wait">
                                             {editingMethod ? (
                                                 <motion.div
@@ -296,7 +296,7 @@ export default function PaymentMethodsModal({ isOpen, onClose }: Props) {
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                        <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
                                                             <button
                                                                 onClick={() => setEditingMethod({ ...editingMethod, isEnabled: !editingMethod.isEnabled })}
                                                                 className={`flex items-center justify-between px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm ${editingMethod.isEnabled ? 'bg-emerald-500 text-white border border-emerald-600' : 'bg-white text-secondary border border-gray-100'}`}

@@ -116,8 +116,7 @@ const Popup: React.FC<Props> = ({
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-md bg-white rounded-[3rem] border border-gray-100 shadow-premium overflow-hidden z-10"
-        >
+          className="relative w-full max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-[3rem] border border-gray-100 shadow-premium z-10"        >
           {/* Close Button */}
           <button
             onClick={closePopup}
@@ -126,7 +125,7 @@ const Popup: React.FC<Props> = ({
             <FiX size={20} />
           </button>
 
-          <div className="p-10">
+          <div className="p-6">
             {/* ===== Logout ===== */}
             {popup.type === "logout" && (
               <div className="text-center space-y-8">

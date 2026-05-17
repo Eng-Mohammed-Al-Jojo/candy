@@ -28,8 +28,7 @@ export default function CloseDayModal({ isOpen, onClose, onConfirm }: Props) {
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-1000 flex items-center justify-center p-6">
-                    {/* Overlay */}
+                <div className="fixed inset-0 z-1000 flex items-start sm:items-center justify-center p-4 sm:p-6">                    {/* Overlay */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -43,8 +42,7 @@ export default function CloseDayModal({ isOpen, onClose, onConfirm }: Props) {
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="relative w-full max-w-lg bg-white rounded-[3rem] border border-gray-100 shadow-premium overflow-hidden z-10 p-8 md:p-12 text-center"
-                    >
+                        className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-[3rem] border border-gray-100 shadow-premium z-10 p-8 md:p-12 text-center"                    >
                         {/* Header Icon */}
                         <div className="w-24 h-24 bg-red-50 text-red-500 rounded-4xl flex items-center justify-center mx-auto mb-8 text-4xl shadow-inner border border-red-100">
                             <FiAlertTriangle />

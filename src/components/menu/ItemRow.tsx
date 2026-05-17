@@ -35,7 +35,7 @@ const ItemRow = React.memo(
       <motion.div
         className={`
           relative flex items-center justify-between w-full rounded-3xl border
-          h-[110px] pr-27 pl-4 bg-white
+          h-[110px] pr-28 pl-2 bg-white mr-2
           transition-all duration-300 group
           ${unavailable
             ? "opacity-40 grayscale cursor-not-allowed border-gray-100 bg-gray-50/30 pointer-events-none"
@@ -49,12 +49,12 @@ const ItemRow = React.memo(
         onClick={handleOrderClick}
       >
         {/* IMAGE (RIGHT SIDE, ABSOLUTE, OVERFLOW) */}
-        <div className="absolute right-10 translate-x-1/2 w-28 h-28 z-10">
+        <div className="absolute right-10 translate-x-1/2 w-30 h-30 z-31">
           <img
             src={item.image ? `/images/${item.image}` : "/logo.png"}
             alt={itemName}
             loading="lazy"
-            className="w-full h-full rounded-full object-cover shadow-md border-2 border-primary-500 transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full rounded-full object-cover bg-white shadow-md border-3 border-primary-500 transition-transform duration-500 group-hover:scale-105"
             onError={(e) => {
               (e.target as HTMLImageElement).src = "/logo.png";
             }}
@@ -63,22 +63,20 @@ const ItemRow = React.memo(
           {/* SOLD OUT OVERLAY */}
           {unavailable && (
             <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
-              <span className="text-[10px] font-black text-white text-center leading-tight">
-                لقد نفذت<br />الكمية
-              </span>
+
             </div>
           )}
 
           {/* FEATURED BADGE */}
           {(item.star || (item as any).isFeatured) && !unavailable && (
-            <div className="absolute -top-1 -right-1 bg-[#B7303E] text-white p-1.5 rounded-full shadow-lg border-2 border-white animate-bounce">
+            <div className="absolute -top-1  bg-[#B7303E] text-white p-1.5 rounded-full shadow-lg border-2 border-white animate-bounce">
               <FaFire size={10} />
             </div>
           )}
         </div>
 
         {/* CONTENT (CENTER-RIGHT) */}
-        <div className="flex-1 text-right overflow-hidden">
+        <div className="flex-1 text-right mr-2 overflow-hidden">
           <h3 className="text-md md:text-lg lg:text-xl font-bold text-gray-900 mb-1 leading-tight truncate">
             {itemName}
           </h3>
@@ -88,7 +86,7 @@ const ItemRow = React.memo(
         </div>
 
         {/* LEFT SECTION (PRICE + BUTTON) */}
-        <div className="flex flex-col items-end gap-2.5 shrink-0 min-w-[90px] pl-2">
+        <div className="flex flex-col items-end gap-2.5 shrink-0 min-w-[90px] pl-4">
           <div className={`font-black text-xl flex items-center gap-0.5 ${unavailable ? "text-gray-400 line-through" : "text-[#355152]"}`}>
             <span className="text-sm font-bold opacity-60">₪</span>
             {basePrice}

@@ -42,7 +42,7 @@ export default function ItemDetailsDrawer({ item, isOpen, onClose }: Props) {
         background: 'var(--bg-card)',
         color: 'var(--text-main)',
         border: '1px solid var(--border-color)',
-        fontFamily: 'Cairo',
+        fontFamily: 'IBM Plex Sans Arabic',
         fontWeight: 'bold',
         fontSize: '14px'
       }

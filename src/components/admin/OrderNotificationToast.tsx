@@ -34,7 +34,7 @@ export default function OrderNotificationToast({ notifications, onClose, onView 
 
                             <div className="flex-1 min-w-0">
                                 <div className="flex justify-between items-start">
-                                    <h3 className="text-sm font-black text-gray-900 font-['Cairo'] tracking-tight">طلب جديد! 🔔</h3>
+                                    <h3 className="text-sm font-black text-gray-900 tracking-tight">طلب جديد! 🔔</h3>
                                     <button
                                         onClick={() => onClose(order.id)}
                                         className="text-gray-400 hover:text-secondary p-1 -m-1 transition-colors"
